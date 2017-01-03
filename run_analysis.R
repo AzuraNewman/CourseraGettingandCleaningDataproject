@@ -92,22 +92,24 @@ results2<-mutate(results2,key=paste(subject,activity,sep="_"))
 
         ##setting up final output
 
+output<-arrange(results2,key)
+
+
 ##using loop combined with tapply to get mean calculations for all key values.
-output<-data.frame(row.names=c("subjectid_activity","feature","mean"))
+test2<-unique(output[,1:2])
 for(i in 4:60){
-        test<-tapply(results2[,i],results2$key,mean)
-        for(j in 1:length(test)){
-                test1<-cbind(testnames[j],names(results2)[i],test[[j]])
-                output<-rbind(output,test1)
-        }
+        test<-tapply(output[,i],output$key,mean)
+        test2<-cbind(test2,test)
+        
 }
 
-##setting names for output columns
-names(output)<-c("subjectid_activity","feature","mean")
+n<-names(output)
+N<-c(n[1:2],n[4:60])
+names(test2)<-N
 
-##separating the subject id and activity info back into two columns
-output<-mutate(output,subject_id=str_split_fixed(output$subjectid_activity,"_",2)[,1])
-output<-mutate(output,activity=str_split_fixed(output$subjectid_activity,"_",2)[,2])
-output<-select(output,2:5)
+write.table(test2,file = "output.csv")
+
+##setting names for output columns
+
 
 ##output is considered the results for part 5 of the assignment
